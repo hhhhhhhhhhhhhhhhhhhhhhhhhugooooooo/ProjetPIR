@@ -1,4 +1,75 @@
+turtles-own [energy]
 
+
+
+
+
+to setup
+  clear-all
+  setup-patches
+  setup-turtles
+  reset-ticks
+end
+
+to go
+
+  move-turtles
+  eat-grass
+  reproduce
+  check-death
+  regrow-grass
+  tick
+end
+to eat-grass
+  ask turtles [
+    if pcolor = green[
+      set pcolor black
+      set energy energy + energy-from-grass
+    ]
+    ifelse show-energy?
+    [ set label energy]
+    [set label ""]
+  ]
+
+end
+
+
+to setup-patches
+  ask patches[set pcolor green]
+end
+to setup-turtles
+  create-turtles number
+  ask turtles [setxy random-xcor random-ycor]
+  ask turtles [set color red]
+end
+
+to move-turtles
+  ask turtles[
+    right random 180
+    forward 1
+    set energy energy - 1
+  ]
+end
+
+to reproduce
+  ask turtles[
+    if energy > birth-energy [
+      set energy energy - birth-energy
+      hatch 1 [ set energy birth-energy ]
+    ]
+  ]
+end
+
+to check-death
+  ask turtles [
+    if energy <= 0 [die]
+  ]
+end
+to regrow-grass
+  ask patches [
+    if random 100 < 3 [set pcolor green]
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
@@ -21,11 +92,142 @@ GRAPHICS-WINDOW
 16
 -16
 16
-0
-0
+1
+1
 1
 ticks
 30.0
+
+BUTTON
+46
+73
+109
+106
+NIL
+setup
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+109
+73
+172
+106
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
+
+MONITOR
+18
+118
+101
+163
+NIL
+count turtles
+17
+1
+11
+
+MONITOR
+101
+118
+194
+163
+green patches
+count patches with [pcolor = green]
+17
+1
+11
+
+SWITCH
+40
+169
+174
+202
+show-energy?
+show-energy?
+1
+1
+-1000
+
+PLOT
+4
+215
+204
+365
+Totals
+time
+totals
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"turtles" 1.0 0 -16777216 true "" "plot count turtles"
+"grass" 1.0 0 -7500403 true "" "plot count patches with [pcolor = green]"
+
+SLIDER
+21
+382
+193
+415
+number
+number
+0
+2000
+293.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+20
+426
+192
+459
+energy-from-grass
+energy-from-grass
+0
+100
+25.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+14
+188
+47
+birth-energy
+birth-energy
+0
+100
+15.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
