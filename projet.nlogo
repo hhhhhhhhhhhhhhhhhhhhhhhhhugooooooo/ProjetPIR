@@ -2,22 +2,19 @@ breed [miners miner]
 breed [blocks block]
 
 
-miners-own [energy pool reliability power coins]
+miners-own [energy pool reliability power consumption coins published-block]
 blocks-own [difficulty]
 
-globals [i-creation]
-
-
-
-
-
-
-
-
+globals [i-creation reward total-energy moore-law time creation-delay]
 
 to setup
   clear-all
   set i-creation 0
+  set creation-delay 10
+  set reward 50
+  set total-energy 0
+  set moore-law 0
+  set time 26280 ; time refers to the duration before reward gets cut by half
   setup-miners
   reset-ticks
 end
@@ -25,17 +22,20 @@ end
 to go
 
   update-miners
+  update-power
   update-blocks
+  update-reward
 
   tick
 end
 to update-miners
-  if i-creation > 10 [ setup-miners set i-creation 0]
-  if i-creation <= 10 [set i-creation i-creation + 1]
+  if creation-delay < 20000
+  [if i-creation > creation-delay [ new-miners set i-creation 0 set creation-delay (creation-delay * 10) / 9]
+    if i-creation <= creation-delay [set i-creation i-creation + 1]]
   ask miners [
+    mine-block
     update-energy
     update-pool
-    update-power
     update-coins
   ]
 
@@ -48,40 +48,68 @@ to update-blocks
 end
 
 to setup-miners
-  create-miners 90 [
+  create-miners 100 [
     set energy 0
     set pool 0
-    set reliability 0
-    set power 0
+    set reliability random-float 1.0
+    set reliability (2 * reliability) - 1
+    set power random 1000
+    set consumption power
+    set coins 0
+  ]
+end
+
+to new-miners
+  create-miners 10 [
+    set energy 0
+    set pool 0
+    set reliability random-float 1.0
+    set reliability (2 * reliability) - 1
+    set power random 1000
     set coins 0
   ]
 end
 
 
 to update-energy
-
+  set energy consumption
+  set total-energy total-energy + energy
+  set energy 0
 end
 
 
 to update-pool
-
+  ; pour le moment uniquement des mineurs seuls, correspondant au pool numero 0
 end
 
 
 
 to update-power
+  ifelse moore-law > 105120 [ask miners [set power (power * 2) set consumption (consumption / 4) * 5] set moore-law 0]
+  [set moore-law moore-law + 1]
 
 end
 
 
 
 to update-coins
+  if published-block = 1 [set coins coins + reward]
+end
 
+to update-reward
+  if ticks > time [set reward reward / 2 set time time + ticks]
 end
 
 
 
 
+
+to mine-block
+  ;definir la façon de miner des blocs, uniquement PoW
+  ; doit inclure un calcul avec power
+  ; doit inclure published-block
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 210
