@@ -2,7 +2,7 @@ breed [miners miner]
 breed [blocks block]
 
 
-miners-own [energy pool reliability power consumption coins published-block]
+miners-own [pool reliability power consumption coins published-block nonce node-age]
 blocks-own [difficulty]
 
 globals [i-creation reward total-energy moore-law time creation-delay]
@@ -22,57 +22,61 @@ end
 to go
 
   update-miners
+  mine-block
   update-power
-  update-blocks
   update-reward
+
 
   tick
 end
+
 to update-miners
-  if creation-delay < 20000
+  if creation-delay < 8000
   [if i-creation > creation-delay [ new-miners set i-creation 0 set creation-delay (creation-delay * 10) / 9]
     if i-creation <= creation-delay [set i-creation i-creation + 1]]
   ask miners [
-    mine-block
     update-energy
     update-pool
     update-coins
+    set published-block 0
+    set node-age node-age + 1
   ]
 
 
 
 end
 
-to update-blocks
 
-end
 
 to setup-miners
   create-miners 100 [
-    set energy 0
     set pool 0
     set reliability random-float 1.0
     set reliability (2 * reliability) - 1
-    set power random 1000
+    set power random 100
     set consumption power
     set coins 0
+    set nonce 0
+    set node-age 0
   ]
 end
 
 to new-miners
   create-miners 10 [
-    set energy 0
     set pool 0
     set reliability random-float 1.0
     set reliability (2 * reliability) - 1
-    set power random 1000
+    set power random 100
+    set consumption power
     set coins 0
+    set nonce 0
+    set node-age 0
   ]
 end
 
 
 to update-energy
-  set energy consumption
+  let energy consumption
   set total-energy total-energy + energy
   set energy 0
 end
@@ -85,8 +89,8 @@ end
 
 
 to update-power
-  ifelse moore-law > 105120 [ask miners [set power (power * 2) set consumption (consumption / 4) * 5] set moore-law 0]
-  [set moore-law moore-law + 1]
+  if moore-law > 105120 [ask miners [set power (power * 2) set consumption (consumption / 4) * 5] set moore-law 0]
+  set moore-law moore-law + 1
 
 end
 
@@ -105,9 +109,19 @@ end
 
 
 to mine-block
-  ;definir la façon de miner des blocs, uniquement PoW
-  ; doit inclure un calcul avec power
-  ; doit inclure published-block
+  create-blocks 1  [
+    set difficulty (random-float 1) * (sum [power] of miners)
+  ]
+  ask miners [
+    set nonce (sum [difficulty] of blocks) * power * random-float 1
+  ]
+  let id max-one-of miners [nonce]
+  ask id [
+    set published-block 1
+  ]
+  ask blocks [
+    die
+  ]
 
 end
 @#$#@#$#@
@@ -188,7 +202,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
+"pen-1" 1.0 0 -7500403 true "" "plot [coins] of miner 0"
 
 @#$#@#$#@
 ## WHAT IS IT?
