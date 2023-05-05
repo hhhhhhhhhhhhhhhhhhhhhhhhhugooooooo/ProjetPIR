@@ -1,9 +1,11 @@
 breed [miners miner]
 breed [blocks block]
+breed [mining-pools mining-pool]
 
 
 miners-own [pool reliability power consumption coins published-block nonce node-age]
 blocks-own [difficulty]
+mining-pools-own [ pool-energy pool-power pool-coins]
 
 globals [i-creation reward total-energy moore-law time creation-delay]
 
@@ -16,6 +18,7 @@ to setup
   set moore-law 0
   set time 26280 ; time refers to the duration before reward gets cut by half
   setup-miners
+  setup-mining-pools
   reset-ticks
 end
 
@@ -23,8 +26,15 @@ to go
 
   update-miners
   mine-block
+  ask miners [
+    update-coins
+  ]
   update-power
   update-reward
+  ask miners [
+    set published-block 0
+  ]
+
 
 
   tick
@@ -37,14 +47,18 @@ to update-miners
   ask miners [
     update-energy
     update-pool
-    update-coins
-    set published-block 0
     set node-age node-age + 1
   ]
-
-
-
 end
+
+to setup-mining-pools
+  create-mining-pools 7 [
+    set pool-energy 0
+    set pool-power 0
+    set pool-coins 0
+  ]
+end
+
 
 
 
@@ -78,12 +92,52 @@ end
 to update-energy
   let energy consumption
   set total-energy total-energy + energy
+  if pool = mining-pool who [
+    ask mining-pool who [ set pool-energy pool-energy + energy]
+  ]
   set energy 0
 end
 
 
 to update-pool
-  ; pour le moment uniquement des mineurs seuls, correspondant au pool numero 0
+  if node-age = 262800 [
+    if pool = 0 [
+      set pool random 6
+      set pool pool + 1
+    ]
+  ]
+  if ticks = 1000000 [
+    if pool = 0 [
+      set pool random 6
+      set pool pool + 1
+    ]
+  ]
+
+  if pool != 0 [
+    if pool = 1 [
+      ; définir un certain comportement en modifiant reliability power consumption etc
+    ]
+
+    if pool = 2 [
+      ; définir un certain comportement en modifiant reliability power consumption etc
+    ]
+
+    if pool = 3 [
+      ; définir un certain comportement en modifiant reliability power consumption etc
+    ]
+
+    if pool = 4 [
+      ; définir un certain comportement en modifiant reliability power consumption etc
+    ]
+
+    if pool = 5 [
+      ; définir un certain comportement en modifiant reliability power consumption etc
+    ]
+
+    if pool = 6 [
+      ; définir un certain comportement en modifiant reliability power consumption etc
+    ]
+  ]
 end
 
 
