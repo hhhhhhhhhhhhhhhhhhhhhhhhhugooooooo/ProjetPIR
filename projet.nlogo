@@ -275,6 +275,7 @@ false
 "" ""
 PENS
 "pen-1" 1.0 0 -7500403 true "" "plot [pool-energy] of mining-pool 3"
+"pen-11" 1.0 0 -2674135 true "" "plot total-energy"
 
 @#$#@#$#@
 ## WHAT IS IT?
