@@ -17,8 +17,8 @@ to setup
   set total-energy 0
   set moore-law 0
   set time 26280 ; time refers to the duration before reward gets cut by half
-  setup-miners
   setup-mining-pools
+  setup-miners
   reset-ticks
 end
 
@@ -44,8 +44,8 @@ to update-miners
   if creation-delay < 8000
   [if i-creation > creation-delay [ new-miners set i-creation 0 set creation-delay (creation-delay * 10) / 9]
     if i-creation <= creation-delay [set i-creation i-creation + 1]]
+  update-energy
   ask miners [
-    update-energy
     update-pool
     set node-age node-age + 1
   ]
@@ -90,17 +90,35 @@ end
 
 
 to update-energy
-  let energy consumption
-  set total-energy total-energy + energy
-  if pool = mining-pool who [
-    ask mining-pool who [ set pool-energy pool-energy + energy]
+  ask miners [
+    let energy consumption
+    set total-energy total-energy + energy
+
+    if pool = 1 [
+    ask mining-pool 1 [ set pool-energy pool-energy + energy]
+  ]
+    if pool = 2 [
+    ask mining-pool 2 [ set pool-energy pool-energy + energy]
+  ]
+    if pool = 3 [
+    ask mining-pool 3 [ set pool-energy pool-energy + energy]
+  ]
+    if pool = 4 [
+    ask mining-pool 4 [ set pool-energy pool-energy + energy]
+  ]
+    if pool = 5 [
+    ask mining-pool 5 [ set pool-energy pool-energy + energy]
+  ]
+    if pool = 6 [
+    ask mining-pool 6 [ set pool-energy pool-energy + energy]
   ]
   set energy 0
+  ]
 end
 
 
 to update-pool
-  if node-age = 262800 [
+  if node-age = 26280 [
     if pool = 0 [
       set pool random 6
       set pool pool + 1
@@ -256,7 +274,7 @@ true
 false
 "" ""
 PENS
-"pen-1" 1.0 0 -7500403 true "" "plot [coins] of miner 0"
+"pen-1" 1.0 0 -7500403 true "" "plot [pool-energy] of mining-pool 3"
 
 @#$#@#$#@
 ## WHAT IS IT?
