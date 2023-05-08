@@ -92,25 +92,27 @@ end
 to update-energy
   ask miners [
     let energy consumption
+    let currentcoins coins
+    let currentpower power
     set total-energy total-energy + energy
 
     if pool = 1 [
-    ask mining-pool 1 [ set pool-energy pool-energy + energy]
+    ask mining-pool 1 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
   ]
     if pool = 2 [
-    ask mining-pool 2 [ set pool-energy pool-energy + energy]
+    ask mining-pool 2 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
   ]
     if pool = 3 [
-    ask mining-pool 3 [ set pool-energy pool-energy + energy]
+    ask mining-pool 3 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
   ]
     if pool = 4 [
-    ask mining-pool 4 [ set pool-energy pool-energy + energy]
+    ask mining-pool 4 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
   ]
     if pool = 5 [
-    ask mining-pool 5 [ set pool-energy pool-energy + energy]
+    ask mining-pool 5 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
   ]
     if pool = 6 [
-    ask mining-pool 6 [ set pool-energy pool-energy + energy]
+    ask mining-pool 6 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
   ]
   set energy 0
   ]
@@ -118,7 +120,7 @@ end
 
 
 to update-pool
-  if node-age = 26280 [
+  if node-age = 2628 [
     if pool = 0 [
       set pool random 6
       set pool pool + 1
@@ -161,7 +163,7 @@ end
 
 
 to update-power
-  if moore-law > 105120 [ask miners [set power (power * 2) set consumption (consumption / 4) * 5] set moore-law 0]
+  if moore-law > 10512 [ask miners [set power (power * 2) set consumption (consumption / 4) * 5] set moore-law 0]
   set moore-law moore-law + 1
 
 end
@@ -259,11 +261,11 @@ NIL
 0
 
 PLOT
-21
-156
-221
-306
-plot 1
+7
+225
+207
+375
+Mining pool 3 records
 NIL
 NIL
 0.0
@@ -271,11 +273,45 @@ NIL
 0.0
 10.0
 true
-false
+true
 "" ""
 PENS
-"pen-1" 1.0 0 -7500403 true "" "plot [pool-energy] of mining-pool 3"
-"pen-11" 1.0 0 -2674135 true "" "plot total-energy"
+"power" 1.0 0 -16777216 true "" "plot [pool-power] of mining-pool 3"
+"energy" 1.0 0 -7500403 true "" "plot [pool-energy] of mining-pool 3"
+"coins" 1.0 0 -2674135 true "" "plot [pool-coins] of mining-pool 3"
+
+MONITOR
+70
+150
+127
+195
+power
+[pool-power] of mining-pool 3
+17
+1
+11
+
+MONITOR
+5
+150
+62
+195
+coins
+[pool-coins] of mining-pool 3
+17
+1
+11
+
+MONITOR
+139
+150
+196
+195
+energy
+[pool-energy] of mining-pool 3
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
