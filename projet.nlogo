@@ -7,28 +7,33 @@ miners-own [pool reliability power consumption coins published-block nonce node-
 blocks-own [difficulty]
 mining-pools-own [ pool-energy pool-power pool-coins]
 
-globals [i-creation reward total-energy moore-law time creation-delay]
+globals [i-creation reward total-energy moore-law time creation-delay hardcoded counter-miners3 dividing result3]
 
 to setup
   clear-all
+  set hardcoded 1
   set i-creation 0
   set creation-delay 10
   set reward 50
   set total-energy 0
   set moore-law 0
-  set time 26280 ; time refers to the duration before reward gets cut by half
+  set time 4000 ; time refers to the duration before reward gets cut by half
   setup-mining-pools
   setup-miners
   reset-ticks
 end
 
 to go
+  set counter-miners3 count miners with [pool = 3]
+  set dividing max (list counter-miners3 hardcoded)
+  set result3 ([pool-coins] of mining-pool 3) / dividing
 
-  update-miners
   mine-block
   ask miners [
     update-coins
   ]
+  update-miners
+
   update-power
   update-reward
   ask miners [
@@ -63,6 +68,7 @@ end
 
 
 to setup-miners
+
   create-miners 100 [
     set pool 0
     set reliability random-float 1.0
@@ -92,7 +98,8 @@ end
 to update-energy
   ask miners [
     let energy consumption
-    let currentcoins coins
+    let currentcoins 0
+    if published-block = 1 [set currentcoins reward]
     let currentpower power
     set total-energy total-energy + energy
 
@@ -187,7 +194,7 @@ to mine-block
     set difficulty (random-float 1) * (sum [power] of miners)
   ]
   ask miners [
-    set nonce (sum [difficulty] of blocks) * power * random-float 1
+    set nonce power * random-float 1
   ]
   let id max-one-of miners [nonce]
   ask id [
@@ -200,9 +207,9 @@ to mine-block
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+841
 10
-647
+1278
 448
 -1
 -1
@@ -261,11 +268,11 @@ NIL
 0
 
 PLOT
-7
-225
-207
-375
-Mining pool 3 records
+210
+224
+410
+374
+Miner 0 records
 NIL
 NIL
 0.0
@@ -273,42 +280,30 @@ NIL
 0.0
 10.0
 true
-true
+false
 "" ""
 PENS
-"power" 1.0 0 -16777216 true "" "plot [pool-power] of mining-pool 3"
-"energy" 1.0 0 -7500403 true "" "plot [pool-energy] of mining-pool 3"
-"coins" 1.0 0 -2674135 true "" "plot [pool-coins] of mining-pool 3"
+"miner coins" 1.0 0 -16777216 true "" "plot [coins] of miner 7"
+"miner coins if in a pool" 1.0 0 -7500403 true "" "plot result3"
 
 MONITOR
-70
-150
-127
-195
-power
-[pool-power] of mining-pool 3
+210
+181
+284
+226
+miner coins
+[coins] of miner 7
 17
 1
 11
 
 MONITOR
-5
-150
-62
-195
-coins
-[pool-coins] of mining-pool 3
-17
-1
-11
-
-MONITOR
-139
-150
-196
-195
-energy
-[pool-energy] of mining-pool 3
+283
+180
+430
+225
+miner coins if in pool n°3
+result3
 17
 1
 11
