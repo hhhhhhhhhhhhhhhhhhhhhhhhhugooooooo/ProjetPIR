@@ -3,8 +3,8 @@ breed [blocks block]
 breed [mining-pools mining-pool]
 
 
-miners-own [pool reliability power consumption coins published-block nonce node-age]
-blocks-own [difficulty]
+miners-own [pool reliability power consumption coins published-block nonce node-age hadwon]
+
 mining-pools-own [ pool-energy pool-power pool-coins]
 
 globals [i-creation reward total-energy moore-law time creation-delay hardcoded counter-miners3 dividing result3]
@@ -17,7 +17,7 @@ to setup
   set reward 50
   set total-energy 0
   set moore-law 0
-  set time 4000 ; time refers to the duration before reward gets cut by half
+  set time 40000 ; time refers to the duration before reward gets cut by half
   setup-mining-pools
   setup-miners
   reset-ticks
@@ -26,7 +26,7 @@ end
 to go
   set counter-miners3 count miners with [pool = 3]
   set dividing max (list counter-miners3 hardcoded)
-  set result3 ([pool-coins] of mining-pool 3) / dividing
+  set result3 ([pool-coins] of mining-pool 3)
 
   mine-block
   ask miners [
@@ -53,6 +53,8 @@ to update-miners
   ask miners [
     update-pool
     set node-age node-age + 1
+    if coins < -500 [die]
+
   ]
 end
 
@@ -78,6 +80,7 @@ to setup-miners
     set coins 0
     set nonce 0
     set node-age 0
+    set hadwon 0
   ]
 end
 
@@ -91,6 +94,7 @@ to new-miners
     set coins 0
     set nonce 0
     set node-age 0
+    set hadwon 0
   ]
 end
 
@@ -104,22 +108,22 @@ to update-energy
     set total-energy total-energy + energy
 
     if pool = 1 [
-    ask mining-pool 1 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
+      ask mining-pool 1 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing -(([consumption] of miner 7) / slider-a))]
   ]
     if pool = 2 [
-    ask mining-pool 2 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
+    ask mining-pool 2 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
   ]
     if pool = 3 [
-    ask mining-pool 3 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
+    ask mining-pool 3 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
   ]
     if pool = 4 [
-    ask mining-pool 4 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
+    ask mining-pool 4 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
   ]
     if pool = 5 [
-    ask mining-pool 5 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
+    ask mining-pool 5 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
   ]
     if pool = 6 [
-    ask mining-pool 6 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + currentcoins]
+    ask mining-pool 6 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
   ]
   set energy 0
   ]
@@ -133,7 +137,7 @@ to update-pool
       set pool pool + 1
     ]
   ]
-  if ticks = 1000000 [
+  if ticks = 10000 [
     if pool = 0 [
       set pool random 6
       set pool pool + 1
@@ -170,7 +174,7 @@ end
 
 
 to update-power
-  if moore-law > 10512 [ask miners [set power (power * 2) set consumption (consumption / 4) * 5] set moore-law 0]
+  if moore-law > 10512 [ask miners [set power (power * 2) set consumption (consumption / 7)] set moore-law 0]
   set moore-law moore-law + 1
 
 end
@@ -178,7 +182,10 @@ end
 
 
 to update-coins
-  if published-block = 1 [set coins coins + reward]
+  if published-block = 1 [set coins (coins + reward * 20000)]
+  if published-block = 0 [set hadwon hadwon + 1]
+  if hadwon > 2000 and coins > -10[ set power 2 * power set consumption 2 * consumption set hadwon 0]
+  set coins (coins - consumption / slider-a)
 end
 
 to update-reward
@@ -190,9 +197,7 @@ end
 
 
 to mine-block
-  create-blocks 1  [
-    set difficulty (random-float 1) * (sum [power] of miners)
-  ]
+
   ask miners [
     set nonce power * random-float 1
   ]
@@ -200,9 +205,7 @@ to mine-block
   ask id [
     set published-block 1
   ]
-  ask blocks [
-    die
-  ]
+
 
 end
 @#$#@#$#@
@@ -284,29 +287,44 @@ false
 "" ""
 PENS
 "miner coins" 1.0 0 -16777216 true "" "plot [coins] of miner 7"
-"miner coins if in a pool" 1.0 0 -7500403 true "" "plot result3"
+"miner coins if in a pool" 1.0 0 -7500403 true "" "plot result3 "
 
 MONITOR
 210
 181
-284
+373
 226
-miner coins
+miner usd when out of pool
 [coins] of miner 7
 17
 1
 11
 
 MONITOR
-283
-180
-430
-225
-miner coins if in pool n°3
+373
+181
+520
+226
+miner usd if in pool n°3
 result3
 17
 1
 11
+
+SLIDER
+78
+139
+250
+172
+slider-a
+slider-a
+100
+1000000
+503234.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
