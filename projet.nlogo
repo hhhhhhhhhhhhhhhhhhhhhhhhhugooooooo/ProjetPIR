@@ -3,7 +3,7 @@ breed [blocks block]
 breed [mining-pools mining-pool]
 
 
-miners-own [pool reliability power consumption coins published-block nonce node-age hadwon]
+miners-own [pool power consumption coins published-block nonce node-age hadwon]
 
 mining-pools-own [ pool-energy pool-power pool-coins]
 
@@ -73,8 +73,6 @@ to setup-miners
 
   create-miners 100 [
     set pool 0
-    set reliability random-float 1.0
-    set reliability (2 * reliability) - 1
     set power random 100
     set consumption power
     set coins 0
@@ -87,8 +85,6 @@ end
 to new-miners
   create-miners 10 [
     set pool 0
-    set reliability random-float 1.0
-    set reliability (2 * reliability) - 1
     set power random 100
     set consumption power
     set coins 0
@@ -108,22 +104,22 @@ to update-energy
     set total-energy total-energy + energy
 
     if pool = 1 [
-      ask mining-pool 1 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing -(([consumption] of miner 7) / slider-a))]
+      ask mining-pool 1 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing -((energy) / slider-a))]
   ]
     if pool = 2 [
-    ask mining-pool 2 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
+    ask mining-pool 2 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - ((energy) / slider-a))]
   ]
     if pool = 3 [
-    ask mining-pool 3 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
+    ask mining-pool 3 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - ((energy) / slider-a))]
   ]
     if pool = 4 [
-    ask mining-pool 4 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
+    ask mining-pool 4 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - ((energy) / slider-a))]
   ]
     if pool = 5 [
-    ask mining-pool 5 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
+    ask mining-pool 5 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (energy / slider-a))]
   ]
     if pool = 6 [
-    ask mining-pool 6 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (([consumption] of miner 7) / slider-a))]
+    ask mining-pool 6 [ set pool-energy pool-energy + energy set pool-power pool-power + currentpower set pool-coins pool-coins + (currentcoins * 20000 / dividing - (energy / slider-a))]
   ]
   set energy 0
   ]
@@ -131,7 +127,7 @@ end
 
 
 to update-pool
-  if node-age = 2628 [
+  if node-age = time-before-joining [
     if pool = 0 [
       set pool random 6
       set pool pool + 1
@@ -141,32 +137,6 @@ to update-pool
     if pool = 0 [
       set pool random 6
       set pool pool + 1
-    ]
-  ]
-
-  if pool != 0 [
-    if pool = 1 [
-      ; définir un certain comportement en modifiant reliability power consumption etc
-    ]
-
-    if pool = 2 [
-      ; définir un certain comportement en modifiant reliability power consumption etc
-    ]
-
-    if pool = 3 [
-      ; définir un certain comportement en modifiant reliability power consumption etc
-    ]
-
-    if pool = 4 [
-      ; définir un certain comportement en modifiant reliability power consumption etc
-    ]
-
-    if pool = 5 [
-      ; définir un certain comportement en modifiant reliability power consumption etc
-    ]
-
-    if pool = 6 [
-      ; définir un certain comportement en modifiant reliability power consumption etc
     ]
   ]
 end
@@ -320,7 +290,44 @@ slider-a
 slider-a
 100
 1000000
-503234.0
+1000000.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+410
+258
+529
+303
+Miners with no pool
+count miners with [pool = 0]
+17
+1
+11
+
+MONITOR
+529
+258
+714
+303
+total miners
+count miners with [power != 0]
+17
+1
+11
+
+SLIDER
+409
+225
+581
+258
+time-before-joining
+time-before-joining
+0
+10000
+2628.0
 1
 1
 NIL
